@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component styles using @layer */
+@layer components {
+  .game-canvas {
+    @apply border-2 border-gray-800 rounded-md shadow-lg;
+  }
+  
+  .tetris-container {
+    @apply flex flex-col items-center bg-white p-4 rounded-xl shadow-lg mx-auto max-w-full;
+    width: fit-content;
+  }
+  
+  .game-info {
+    @apply flex justify-between w-full mb-2;
+  }
+  
+  .next-piece-container {
+    @apply w-full;
+  }
+  
+  .controls {
+    @apply flex flex-col gap-1 w-full;
+  }
+  
+  .game-over {
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+           bg-black/80 text-white p-6 rounded-lg text-center z-10;
+  }
+  
+  .game-container {
+    @apply rounded-lg overflow-hidden;
+  }
+}
+
+/* 适应不同屏幕大小的媒体查询 */
+@media (max-width: 768px) {
+  .tetris-container {
+    @apply p-2;
+  }
+  
+  .game-over {
+    @apply p-4;
+  }
+} 
