@@ -11,7 +11,7 @@
         <p>Space Hard Drop</p>
       </div>
     </div>
-    
+
     <div class="tetris-container">
       <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Tetris</h1>
       <div class="game-info">
@@ -31,32 +31,20 @@
             <div ref="nextPieceContainer" class="next-piece"></div>
           </div>
           <div class="controls">
-            <button 
-              @click="startGame" 
-              v-if="!isPlaying" 
-              class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full"
-            >
+            <button @click="startGame" v-if="!isPlaying"
+              class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full">
               Start Game
             </button>
-            <button 
-              @click="pauseGame" 
-              v-if="isPlaying && !isPaused" 
-              class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full"
-            >
+            <button @click="pauseGame" v-if="isPlaying && !isPaused"
+              class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full">
               Pause
             </button>
-            <button 
-              @click="resumeGame" 
-              v-if="isPlaying && isPaused" 
-              class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full"
-            >
+            <button @click="resumeGame" v-if="isPlaying && isPaused"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full">
               Resume
             </button>
-            <button 
-              @click="restartGame" 
-              v-if="isGameOver" 
-              class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full"
-            >
+            <button @click="restartGame" v-if="isGameOver"
+              class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 w-full">
               Restart
             </button>
           </div>
@@ -65,10 +53,8 @@
       <div class="game-over" v-if="isGameOver">
         <h2 class="text-2xl font-bold mb-2">Game Over!</h2>
         <p class="text-xl mb-4">Your score: {{ score }}</p>
-        <button 
-          @click="restartGame" 
-          class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-        >
+        <button @click="restartGame"
+          class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
           Play Again
         </button>
       </div>
@@ -102,14 +88,14 @@ export default {
       if (game) {
         game.destroy()
       }
-      
+
       isPlaying.value = true
       isPaused.value = false
       isGameOver.value = false
       score.value = 0
       level.value = 1
       lines.value = 0
-      
+
       initGame(true)
     }
 
@@ -133,39 +119,39 @@ export default {
 
     const initGame = async (shouldStartGame = true) => {
       if (!gameContainer.value || !nextPieceContainer.value) return
-      
+
       // Calculate canvas size, maintaining 9:16 ratio and as large as possible
       const calculateGameSize = () => {
         // Constants for game grid
         const ROWS = 20;
         const COLS = 10;
-        
+
         // Get available height (75% of window height)
         const availableHeight = window.innerHeight * 0.75;
         const availableWidth = window.innerWidth * 0.8;
-        
+
         // Calculate the largest possible block size that fits within the available space
         // while maintaining the correct aspect ratio
         const maxBlockSizeByHeight = Math.floor(availableHeight / ROWS);
         const maxBlockSizeByWidth = Math.floor(availableWidth / COLS);
-        
+
         // Choose the smaller of the two to ensure it fits both constraints
         const blockSize = Math.min(maxBlockSizeByHeight, maxBlockSizeByWidth);
-        
+
         // Calculate exact game dimensions based on the block size
         const gameWidth = blockSize * COLS;
         const gameHeight = blockSize * ROWS;
-        
-        return { 
-          width: gameWidth, 
+
+        return {
+          width: gameWidth,
           height: gameHeight,
           blockSize: blockSize
         }
       }
-      
+
       const gameSize = calculateGameSize()
       const blockSize = gameSize.blockSize // Use the calculated block size directly
-      
+
       try {
         // Initialize PIXI renderers
         const mainRenderer = await PIXI.autoDetectRenderer({
@@ -174,9 +160,9 @@ export default {
           backgroundColor: 0xf0f0f0,
           antialias: true
         });
-        
+
         // Create the application-like object
-        const mainApp: CustomPixiApp = { 
+        const mainApp: CustomPixiApp = {
           renderer: mainRenderer,
           stage: new PIXI.Container(),
           view: mainRenderer.canvas,
@@ -191,11 +177,11 @@ export default {
             mainRenderer.destroy();
           }
         };
-        
+
         // Start the ticker
         mainApp.ticker.start();
         app = mainApp;
-        
+
         // Initialize PIXI Application for next piece display
         const previewSize = blockSize * 5 // Preview window size is 5 blocks
         const previewRenderer = await PIXI.autoDetectRenderer({
@@ -204,7 +190,7 @@ export default {
           backgroundColor: 0xffffff,
           antialias: true
         });
-        
+
         // Create the preview application-like object
         const previewApp: CustomPixiApp = {
           renderer: previewRenderer,
@@ -221,13 +207,13 @@ export default {
             previewRenderer.destroy();
           }
         };
-        
+
         // Start the ticker
         previewApp.ticker.start();
         nextPieceApp = previewApp;
-        
+
         console.log("PIXI Apps created:", app, nextPieceApp)
-        
+
         // Add canvas to DOM
         gameContainer.value.innerHTML = ''
         // Directly use the canvas element
@@ -237,7 +223,7 @@ export default {
         } else {
           throw new Error("Could not access main renderer canvas")
         }
-        
+
         nextPieceContainer.value.innerHTML = ''
         if (previewRenderer.canvas) {
           nextPieceContainer.value.appendChild(previewRenderer.canvas)
@@ -245,16 +231,16 @@ export default {
         } else {
           throw new Error("Could not access preview renderer canvas")
         }
-        
+
         // Setup render loop
         mainApp.ticker.add(() => {
           mainApp.renderer.render(mainApp.stage);
         });
-        
+
         previewApp.ticker.add(() => {
           previewApp.renderer.render(previewApp.stage);
         });
-        
+
         // Pass block size to game instance
         game = new TetrisGame(mainApp, previewApp, {
           onScoreChange: (newScore: number) => {
@@ -271,7 +257,7 @@ export default {
             isPlaying.value = false
           }
         }, blockSize)
-        
+
         // Only start the game if shouldStartGame is true
         if (shouldStartGame) {
           isPlaying.value = true
@@ -291,7 +277,7 @@ export default {
     // Handle keyboard controls
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!game || !isPlaying.value || isPaused.value || isGameOver.value) return
-      
+
       switch (event.key) {
         case 'ArrowLeft':
           game.moveLeft()
@@ -349,7 +335,8 @@ export default {
 </script>
 
 <style scoped>
-.game-container, .next-piece {
+.game-container,
+.next-piece {
   padding: 0;
   margin: 0;
   display: flex;
@@ -362,4 +349,4 @@ export default {
   backdrop-filter: blur(4px);
   font-size: 0.85rem;
 }
-</style> 
+</style>
